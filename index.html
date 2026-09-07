@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10253f">
+  <meta name="description" content="GradeLines — an educator's K–12 learner development reference.">
+  <title>GradeLines — Development behind the grade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="GradeLines home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>GradeLines</span>
+    </a>
+    <div class="top-actions">
+      <span class="privacy-note"><span aria-hidden="true">◉</span> Profiles stay in this browser</span>
+      <button class="icon-button" id="aboutButton" aria-label="About GradeLines">?</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="pageTitle">
+      <div>
+        <p class="eyebrow">K–12 LEARNER DEVELOPMENT ATLAS</p>
+        <h1 id="pageTitle">See the development <em>behind</em> the grade.</h1>
+      </div>
+      <p class="intro-copy">Explore common developmental patterns, compare learners in context, and find a more useful question than “shouldn’t they know this by now?”</p>
+    </section>
+
+    <section class="workspace" aria-label="Learner explorer">
+      <div class="mode-row">
+        <div class="segmented" role="group" aria-label="Exploration mode">
+          <button class="mode-button active" data-mode="single" aria-pressed="true">One learner</button>
+          <button class="mode-button" data-mode="compare" aria-pressed="false">Compare two</button>
+        </div>
+        <button class="text-button" id="resetButton">Reset baseline</button>
+      </div>
+
+      <div class="profile-grid" id="profileGrid">
+        <article class="profile-card learner-a" aria-labelledby="learnerATitle">
+          <div class="profile-heading">
+            <span class="profile-token">A</span>
+            <div><p class="overline">PRIMARY VIEW</p><h2 id="learnerATitle">Learner A</h2></div>
+          </div>
+          <div class="fields">
+            <label><span>Name or initials <small>optional</small></span><input id="nameA" type="text" maxlength="24" placeholder="Learner A" autocomplete="off"></label>
+            <label><span>Grade</span><select id="gradeA" class="grade-select"></select></label>
+            <label><span>Relative age</span><select id="ageA"><option value="younger">Younger for grade</option><option value="typical" selected>Typical for grade</option><option value="older">Older for grade</option></select></label>
+          </div>
+        </article>
+
+        <article class="profile-card learner-b" id="learnerBCard" aria-labelledby="learnerBTitle" hidden>
+          <div class="profile-heading">
+            <span class="profile-token">B</span>
+            <div><p class="overline">COMPARISON</p><h2 id="learnerBTitle">Learner B</h2></div>
+          </div>
+          <div class="fields">
+            <label><span>Name or initials <small>optional</small></span><input id="nameB" type="text" maxlength="24" placeholder="Learner B" autocomplete="off"></label>
+            <label><span>Grade</span><select id="gradeB" class="grade-select"></select></label>
+            <label><span>Relative age</span><select id="ageB"><option value="younger">Younger for grade</option><option value="typical" selected>Typical for grade</option><option value="older">Older for grade</option></select></label>
+          </div>
+        </article>
+      </div>
+
+      <div class="grade-rail-wrap">
+        <div class="rail-label"><span>Kindergarten</span><span>Grade 12</span></div>
+        <div class="grade-rail" id="gradeRail" aria-label="Select grade"></div>
+      </div>
+    </section>
+
+    <section class="snapshot" aria-live="polite">
+      <div class="snapshot-head">
+        <div><p class="eyebrow">DEVELOPMENTAL SNAPSHOT</p><h2 id="snapshotTitle">Grade 9 · Typical age 14–15</h2></div>
+        <div class="legend"><span><i class="dot a"></i><b id="legendA">Learner A</b></span><span id="legendBWrap" hidden><i class="dot b"></i><b id="legendB">Learner B</b></span></div>
+      </div>
+
+      <div class="identity-banner">
+        <div class="identity-icon" aria-hidden="true">◎</div>
+        <div><h3>Identity, belonging & context</h3><p>Gender identity, culture, language, neurodivergence, stress, opportunity and belonging shape how capacity is expressed. They do not define a separate kind of mind.</p></div>
+        <button class="flyout-button" data-detail="identity" aria-label="Learn more about identity and context">Explore <span>→</span></button>
+      </div>
+
+      <div class="development-columns">
+        <article class="development-column"><div class="column-top boys"><span class="column-index">01</span><div><p>POPULATION LENS</p><h3>Boys</h3></div></div><p>Patterns sometimes associated with male development—presented as overlapping ranges, never rules.</p><button class="flyout-button" data-detail="boys">View context <span>→</span></button></article>
+        <article class="development-column shared"><div class="column-top core"><span class="column-index">02</span><div><p>PRIMARY REFERENCE</p><h3>Shared development</h3></div></div><p>The broad human baseline: what is commonly emerging, strengthening, and becoming more reliable.</p><button class="flyout-button" data-detail="shared">View baseline <span>→</span></button></article>
+        <article class="development-column"><div class="column-top girls"><span class="column-index">03</span><div><p>POPULATION LENS</p><h3>Girls</h3></div></div><p>Patterns sometimes associated with female development—always interpreted within individual context.</p><button class="flyout-button" data-detail="girls">View context <span>→</span></button></article>
+      </div>
+    </section>
+
+    <section class="domains" aria-labelledby="domainsTitle">
+      <div class="section-heading"><div><p class="eyebrow">CAPACITY IS NOT ALWAYS PERFORMANCE</p><h2 id="domainsTitle">What may be developing now</h2></div><p>Select a domain for a concise educator lens.</p></div>
+      <div class="domain-grid" id="domainGrid"></div>
+    </section>
+
+    <footer><p>GradeLines is an educator reference, not an assessment or diagnostic tool.</p><p>Prototype content · Research citations and evidence ratings coming next.</p></footer>
+  </main>
+
+  <dialog id="detailDialog">
+    <button class="dialog-close" aria-label="Close">×</button>
+    <p class="eyebrow" id="dialogEyebrow">GRADELINES NOTE</p>
+    <h2 id="dialogTitle"></h2>
+    <div id="dialogBody"></div>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>
