@@ -49,8 +49,8 @@
           </div>
           <div class="fields">
             <label><span>Name or initials <small>optional</small></span><input id="nameA" type="text" maxlength="24" placeholder="Learner A" autocomplete="off"></label>
-            <label><span>Grade</span><select id="gradeA" class="grade-select"></select></label>
             <label><span>Relative age</span><select id="ageA"><option value="younger">Younger for grade</option><option value="typical" selected>Typical for grade</option><option value="older">Older for grade</option></select></label>
+            <label><span>Height <small>optional</small></span><span class="height-inputs"><select id="feetA" aria-label="Learner A height in feet"></select><select id="inchesA" aria-label="Learner A additional inches"></select></span></label>
           </div>
         </article>
 
@@ -61,16 +61,28 @@
           </div>
           <div class="fields">
             <label><span>Name or initials <small>optional</small></span><input id="nameB" type="text" maxlength="24" placeholder="Learner B" autocomplete="off"></label>
-            <label><span>Grade</span><select id="gradeB" class="grade-select"></select></label>
             <label><span>Relative age</span><select id="ageB"><option value="younger">Younger for grade</option><option value="typical" selected>Typical for grade</option><option value="older">Older for grade</option></select></label>
+            <label><span>Height <small>optional</small></span><span class="height-inputs"><select id="feetB" aria-label="Learner B height in feet"></select><select id="inchesB" aria-label="Learner B additional inches"></select></span></label>
           </div>
         </article>
       </div>
 
-      <div class="grade-rail-wrap">
-        <div class="rail-label"><span>Kindergarten</span><span>Grade 12</span></div>
-        <div class="grade-rail" id="gradeRail" aria-label="Select grade"></div>
-      </div>
+      <section class="growth-field" aria-labelledby="growthTitle">
+        <div class="growth-copy">
+          <p class="eyebrow">PHYSICAL PROPORTION</p>
+          <h2 id="growthTitle">Growing through the grades</h2>
+          <p>Choose a grade line, then compare stature on a proportional six-foot field. Height alone does not indicate maturity, health, ability, or readiness.</p>
+          <div class="height-readouts"><div><i class="dot a"></i><span id="heightLabelA">Learner A · 5′ 5″</span></div><div id="heightLabelBWrap" hidden><i class="dot b"></i><span id="heightLabelB">Learner B · 5′ 3″</span></div></div>
+        </div>
+        <div class="growth-chart">
+          <div class="height-axis" aria-hidden="true"><span>6′</span><span>5′</span><span>4′</span><span>3′</span><span>2′</span><span>1′</span><span>0</span></div>
+          <div class="grade-stack" id="gradeRail" aria-label="Select grade"></div>
+          <div class="silhouette-layer" aria-live="polite">
+            <div class="person person-a" id="personA" role="img"><span class="head"></span><span class="torso"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span></div>
+            <div class="person person-b" id="personB" role="img" hidden><span class="head"></span><span class="torso"></span><span class="arm left"></span><span class="arm right"></span><span class="leg left"></span><span class="leg right"></span></div>
+          </div>
+        </div>
+      </section>
     </section>
 
     <section class="snapshot" aria-live="polite">
@@ -105,6 +117,14 @@
     <p class="eyebrow" id="dialogEyebrow">GRADELINES NOTE</p>
     <h2 id="dialogTitle"></h2>
     <div id="dialogBody"></div>
+  </dialog>
+  <dialog id="spectrumPanel" class="spectrum-panel">
+    <button class="dialog-close" aria-label="Close spectrum panel">×</button>
+    <p class="eyebrow">SELECTED GRADE LINE</p>
+    <h2 id="spectrumTitle">Grade 9</h2>
+    <p class="spectrum-intro" id="spectrumIntro">Typical age 14–15. Learner positions below are a structural preview; research-based ranges are coming next.</p>
+    <div class="spectrum-list" id="spectrumList"></div>
+    <p class="prototype-key">Illustrative interface only · Not an assessment</p>
   </dialog>
   <script src="app.js"></script>
 </body>
