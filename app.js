@@ -22,12 +22,15 @@ const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 
 function fillGrades(){
-  $$(".grade-select").forEach((select,i)=>{
-    select.innerHTML=grades.map(g=>`<option value="${g}" ${g==="9"?"selected":""}>${g==="K"?"Kindergarten":`Grade ${g}`}</option>`).join("");
-    select.addEventListener("change",e=>{state[`grade${i?"B":"A"}`]=e.target.value;state.active=i?"B":"A";render();});
+  $("#gradeRail").innerHTML=[...grades].reverse().map(g=>`<button class="grade-button" data-grade="${g}" aria-label="${g==="K"?"Kindergarten":`Grade ${g}`}"><span>${g==="K"?"K":g}</span></button>`).join("");
+  $$(".grade-button").forEach(btn=>btn.addEventListener("click",()=>{const key=state.active==="B"&&state.mode==="compare"?"gradeB":"gradeA";state[key]=btn.dataset.grade;render();openSpectrum(btn.dataset.grade);}));
+}
+function fillHeights(){
+  ['A','B'].forEach((w,i)=>{
+    $(`#feet${w}`).innerHTML=[2,3,4,5,6].map(v=>`<option value="${v}" ${v===5?'selected':''}>${v} ft</option>`).join('');
+    $(`#inches${w}`).innerHTML=Array.from({length:12},(_,v)=>`<option value="${v}" ${v===(i?3:5)?'selected':''}>${v} in</option>`).join('');
+    [$(`#feet${w}`),$(`#inches${w}`)].forEach(el=>el.addEventListener('change',render));
   });
-  $("#gradeRail").innerHTML=grades.map(g=>`<button class="grade-button" data-grade="${g}" aria-label="${g==="K"?"Kindergarten":`Grade ${g}`}">${g}</button>`).join("");
-  $$(".grade-button").forEach(btn=>btn.addEventListener("click",()=>{const key=state.active==="B"&&state.mode==="compare"?"gradeB":"gradeA";state[key]=btn.dataset.grade;$(`#${key}`).value=btn.dataset.grade;render();}));
 }
 function renderDomains(){
   $("#domainGrid").innerHTML=domains.map((d,i)=>`<button class="domain-card" data-domain="${i}"><span class="domain-icon">${d[0]}</span><h3>${d[1]}</h3><p>${d[2]}</p><span class="arrow">→</span></button>`).join("");
@@ -40,18 +43,33 @@ function render(){
   $("#profileGrid").classList.toggle("single",!compare);
   $$(".grade-button").forEach(b=>{b.classList.toggle("selected-a",b.dataset.grade===state.gradeA);b.classList.toggle("selected-b",compare&&b.dataset.grade===state.gradeB)});
   $("#legendA").textContent=learnerName("A");$("#legendB").textContent=learnerName("B");
+  $("#heightLabelBWrap").hidden=!compare;$("#personB").hidden=!compare;
+  renderHeight('A');if(compare)renderHeight('B');
   const a=state.gradeA, b=state.gradeB;
   $("#snapshotTitle").textContent=compare&&a!==b?`${label(a)} (${ages[a]}) · ${label(b)} (${ages[b]})`:`${label(a)} · Typical age ${ages[a]}`;
+}
+function renderHeight(w){
+  const feet=+$(`#feet${w}`).value,inches=+$(`#inches${w}`).value,total=Math.min(72,feet*12+inches),person=$(`#person${w}`);
+  person.style.height=`${(total/72)*100}%`;
+  person.style.left=w==='A'?(state.mode==='compare'?'46%':'50%'):'54%';
+  person.setAttribute('aria-label',`${learnerName(w)}, ${feet} feet ${inches} inches tall`);
+  $(`#heightLabel${w}`).textContent=`${learnerName(w)} · ${feet}′ ${inches}″`;
 }
 function label(g){return g==="K"?"Kindergarten":`Grade ${g}`}
 function openDetail(key){const d=details[key];$("#dialogEyebrow").textContent=d[1].toUpperCase();$("#dialogTitle").textContent=d[0];$("#dialogBody").innerHTML=`<p>${d[2]}</p>`;$("#detailDialog").showModal()}
 function openDomain(i){const d=domains[i],grade=state.gradeA;$("#dialogEyebrow").textContent=`${label(grade).toUpperCase()} · PROTOTYPE LENS`;$("#dialogTitle").textContent=d[1];$("#dialogBody").innerHTML=`<p><strong>${d[2]}.</strong> The research-grounded progression for this domain will be added next.</p><p>Each finished entry will separate <em>commonly emerging capacity</em>, <em>school expectations</em>, <em>helpful supports</em>, and <em>what not to assume</em>.</p>`;$("#detailDialog").showModal()}
+function openSpectrum(grade){
+  $("#spectrumTitle").textContent=label(grade);$("#spectrumIntro").textContent=`Typical age ${ages[grade]}. Learner positions below are a structural preview; research-based ranges are coming next.`;
+  $("#spectrumList").innerHTML=domains.map((d,i)=>`<section class="spectrum-row"><header><span>${d[1]}</span><span>emerging → reliable</span></header><div class="spectrum-track"><i class="spectrum-range"></i><i class="spectrum-marker" style="left:${42+(i%4)*4}%"></i>${state.mode==='compare'?`<i class="spectrum-marker b" style="left:${54-(i%3)*3}%"></i>`:''}</div></section>`).join('');
+  $("#spectrumPanel").showModal();
+}
 
 $$('.mode-button').forEach(btn=>btn.addEventListener('click',()=>{state.mode=btn.dataset.mode;$$('.mode-button').forEach(b=>{b.classList.toggle('active',b===btn);b.setAttribute('aria-pressed',b===btn)});if(state.mode==='compare')state.active='B';render()}));
 ['A','B'].forEach(w=>{$(`#name${w}`).addEventListener('input',render);$(`#learner${w}Card`).addEventListener('click',()=>state.active=w)});
 $$('.flyout-button').forEach(b=>b.addEventListener('click',()=>openDetail(b.dataset.detail)));
 $('#aboutButton').addEventListener('click',()=>openDetail('about'));
-$('#resetButton').addEventListener('click',()=>{state.gradeA='9';state.gradeB='9';state.active='A';['A','B'].forEach(w=>{$(`#name${w}`).value='';$(`#grade${w}`).value='9';$(`#age${w}`).value='typical'});render()});
+$('#resetButton').addEventListener('click',()=>{state.gradeA='9';state.gradeB='9';state.active='A';['A','B'].forEach((w,i)=>{$(`#name${w}`).value='';$(`#age${w}`).value='typical';$(`#feet${w}`).value='5';$(`#inches${w}`).value=i?'3':'5'});render()});
 $('#detailDialog .dialog-close').addEventListener('click',()=>$('#detailDialog').close());
 $('#detailDialog').addEventListener('click',e=>{if(e.target===$('#detailDialog'))$('#detailDialog').close()});
-fillGrades();renderDomains();render();
+$('#spectrumPanel .dialog-close').addEventListener('click',()=>$('#spectrumPanel').close());
+fillGrades();fillHeights();renderDomains();render();
