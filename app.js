@@ -18,6 +18,17 @@ const details = {
   about:["About GradeLines","See the development behind the grade","GradeLines is being built as a quick, humane educator reference. It helps interpret behavior and readiness in context; it does not diagnose, rank or predict an individual learner. Profile information remains in this browser session." ]
 };
 const state={mode:"single",active:"A",gradeA:"9",gradeB:"9"};
+let researchData=null;
+const domainMatchers=[
+  /reading|writing|communication|literacy/i,
+  /mathematics/i,
+  /reasoning|abstraction|metacognition/i,
+  /problem solving/i,
+  /executive function|impulse control|judgment|risk|peer influence/i,
+  /social-emotional|identity|belonging|Maslow|needs research|autonomy/i,
+  /height|physical|puberty|sleep|nutrition|caloric/i,
+  /computational|programming|coding|debugging|systems thinking/i
+];
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 
@@ -33,7 +44,8 @@ function fillHeights(){
   });
 }
 function renderDomains(){
-  $("#domainGrid").innerHTML=domains.map((d,i)=>`<button class="domain-card" data-domain="${i}"><span class="domain-icon">${d[0]}</span><h3>${d[1]}</h3><p>${d[2]}</p><span class="arrow">→</span></button>`).join("");
+  const profile=getProfile('9');
+  $("#domainGrid").innerHTML=domains.map((d,i)=>{const count=profile?claimsForDomain(profile,i).length:0;return `<button class="domain-card" data-domain="${i}"><span class="domain-icon">${d[0]}</span><h3>${d[1]}</h3><p>${count?`${count} Grade 9 evidence notes`:d[2]}</p>${count?'<b class="ready-badge">RESEARCH READY</b>':''}<span class="arrow">→</span></button>`}).join("");
   $$(".domain-card").forEach(btn=>btn.addEventListener("click",()=>openDomain(+btn.dataset.domain)));
 }
 function learnerName(which){return $(`#name${which}`).value.trim()||`Learner ${which}`}
@@ -44,6 +56,7 @@ function render(){
   $$(".grade-button").forEach(b=>{b.classList.toggle("selected-a",b.dataset.grade===state.gradeA);b.classList.toggle("selected-b",compare&&b.dataset.grade===state.gradeB)});
   $("#legendA").textContent=learnerName("A");$("#legendB").textContent=learnerName("B");
   $("#heightLabelBWrap").hidden=!compare;$("#personB").hidden=!compare;
+  $("#referenceHeightBand").hidden=state.gradeA!=="9";
   renderHeight('A');if(compare)renderHeight('B');
   const a=state.gradeA, b=state.gradeB;
   $("#snapshotTitle").textContent=compare&&a!==b?`${label(a)} (${ages[a]}) · ${label(b)} (${ages[b]})`:`${label(a)} · Typical age ${ages[a]}`;
@@ -56,13 +69,25 @@ function renderHeight(w){
   $(`#heightLabel${w}`).textContent=`${learnerName(w)} · ${feet}′ ${inches}″`;
 }
 function label(g){return g==="K"?"Kindergarten":`Grade ${g}`}
+function getProfile(grade){return String(grade)==='9'?researchData?.grade_profiles?.find(p=>p.grade===9):null}
+function claimsForDomain(profile,i){return profile.observations.filter(o=>domainMatchers[i].test(o.domain))}
+function esc(value){return String(value??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function openDetail(key){const d=details[key];$("#dialogEyebrow").textContent=d[1].toUpperCase();$("#dialogTitle").textContent=d[0];$("#dialogBody").innerHTML=`<p>${d[2]}</p>`;$("#detailDialog").showModal()}
-function openDomain(i){const d=domains[i],grade=state.gradeA;$("#dialogEyebrow").textContent=`${label(grade).toUpperCase()} · PROTOTYPE LENS`;$("#dialogTitle").textContent=d[1];$("#dialogBody").innerHTML=`<p><strong>${d[2]}.</strong> The research-grounded progression for this domain will be added next.</p><p>Each finished entry will separate <em>commonly emerging capacity</em>, <em>school expectations</em>, <em>helpful supports</em>, and <em>what not to assume</em>.</p>`;$("#detailDialog").showModal()}
+function openDomain(i){
+  const d=domains[i],grade=state.gradeA,profile=getProfile(grade),claims=profile?claimsForDomain(profile,i):[];
+  $("#dialogEyebrow").textContent=`${label(grade).toUpperCase()} · EVIDENCE LENS`;$("#dialogTitle").textContent=d[1];
+  if(!claims.length){$("#dialogBody").innerHTML=`<p><strong>${d[2]}.</strong> The interface contract is being validated in Grade 9 before this grade is activated.</p><p>No individual position is inferred from grade alone.</p>`}
+  else{$("#dialogBody").innerHTML=`<p class="evidence-preface">${claims.length} sourced notes. These describe population evidence, expectations, or permissions—not an individual score.</p>${claims.map(o=>`<article class="evidence-card"><div class="evidence-meta"><span>${esc(o.classification)}</span><span class="strength ${esc(o.evidence_strength)}">${esc(o.evidence_strength)} evidence</span></div><h3>${esc(o.claim)}</h3><dl><dt>Range or scope</dt><dd>${esc(o.typical_range)}</dd><dt>Important variation</dt><dd>${esc(o.variability)}</dd><dt>Do not assume</dt><dd>${esc(o.what_educators_should_not_assume)}</dd></dl><a href="${esc(o.direct_url)}" target="_blank" rel="noopener">${esc(o.authority)} · ${esc(o.source_date)} ↗</a></article>`).join('')}`}
+  $("#detailDialog").showModal();
+}
 function openSpectrum(grade){
-  $("#spectrumTitle").textContent=label(grade);$("#spectrumIntro").textContent=`Typical age ${ages[grade]}. Learner positions below are a structural preview; research-based ranges are coming next.`;
-  $("#spectrumList").innerHTML=domains.map((d,i)=>`<section class="spectrum-row"><header><span>${d[1]}</span><span>emerging → reliable</span></header><div class="spectrum-track"><i class="spectrum-range"></i><i class="spectrum-marker" style="left:${42+(i%4)*4}%"></i>${state.mode==='compare'?`<i class="spectrum-marker b" style="left:${54-(i%3)*3}%"></i>`:''}</div></section>`).join('');
+  const profile=getProfile(grade);$("#spectrumTitle").textContent=label(grade);
+  $("#spectrumIntro").textContent=profile?`${profile.conventional_ages} ${profile.overlapping_ages} Grade supplies context; it does not assign an individual developmental position.`:`Typical age ${ages[grade]}. Research is staged, but Grade 9 is the active interface reference.`;
+  $("#spectrumList").innerHTML=domains.map((d,i)=>{const count=profile?claimsForDomain(profile,i).length:0;return `<button class="spectrum-row spectrum-link" data-spectrum-domain="${i}"><header><span>${d[1]}</span><span>${count?`${count} evidence notes`:'not yet activated'}</span></header><div class="spectrum-track"><i class="spectrum-range ${count?'verified':''}"></i><span class="not-inferred">individual position not inferred</span></div></button>`}).join('');
+  $$("[data-spectrum-domain]").forEach(b=>b.addEventListener('click',()=>{$("#spectrumPanel").close();openDomain(+b.dataset.spectrumDomain)}));
   $("#spectrumPanel").showModal();
 }
+async function loadResearch(){try{const response=await fetch('gradelines-data.json');if(!response.ok)throw new Error('data unavailable');researchData=await response.json();$("#researchStatus").textContent='Grade 9 pilot · 24 sourced observations · checked September 7, 2026';renderDomains()}catch(error){$("#researchStatus").textContent='Research layer unavailable · interface remains usable'}}
 
 $$('.mode-button').forEach(btn=>btn.addEventListener('click',()=>{state.mode=btn.dataset.mode;$$('.mode-button').forEach(b=>{b.classList.toggle('active',b===btn);b.setAttribute('aria-pressed',b===btn)});if(state.mode==='compare')state.active='B';render()}));
 ['A','B'].forEach(w=>{$(`#name${w}`).addEventListener('input',render);$(`#learner${w}Card`).addEventListener('click',()=>state.active=w)});
@@ -72,4 +97,4 @@ $('#resetButton').addEventListener('click',()=>{state.gradeA='9';state.gradeB='9
 $('#detailDialog .dialog-close').addEventListener('click',()=>$('#detailDialog').close());
 $('#detailDialog').addEventListener('click',e=>{if(e.target===$('#detailDialog'))$('#detailDialog').close()});
 $('#spectrumPanel .dialog-close').addEventListener('click',()=>$('#spectrumPanel').close());
-fillGrades();fillHeights();renderDomains();render();
+fillGrades();fillHeights();renderDomains();render();loadResearch();
