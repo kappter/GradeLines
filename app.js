@@ -19,6 +19,38 @@ const details = {
 };
 const state={mode:"single",active:"A",gradeA:"9",gradeB:"9"};
 let researchData=null;
+const guideTopics={
+  baseline:{kicker:"THE CLOSEST THING TO A COMMON BASELINE",title:"Strong expectations, flexible pathways",intro:"These are useful design references for many Grade 9 classrooms. They are not tests of normality.",cards:[
+    {icon:"8–10",title:"Hours of sleep",text:"The population recommendation for ages 13–18. Schedules and demands can help or hinder it.",move:"Design move: avoid treating fatigue as character.",ids:["G9-006"]},
+    {icon:"60+",title:"Minutes of activity",text:"Daily moderate-to-vigorous movement is the health reference for ages 6–17—not an athletic standard.",move:"Design move: offer inclusive ways to move.",ids:["G9-007"]},
+    {icon:"↗",title:"Higher-order work",text:"Model, reason, argue, critique, use tools, notice structure, and revise—not merely recall.",move:"Design move: keep the demand; vary the access route.",ids:["G9-009","G9-010"]},
+    {icon:"◎",title:"Belonging matters",text:"Feeling that adults and peers care is associated with healthier and more successful school experience.",move:"Design move: make reliable adult connection visible.",ids:["G9-016","G9-017"]}
+  ]},
+  nature:{kicker:"BODY + ENVIRONMENT",title:"Nature supplies ranges, not destinies",intro:"Puberty, stature, sleep, movement and nutrition interact with culture, health, access and daily conditions.",cards:[
+    {icon:"↕",title:"Growth overlaps",text:"CDC sex-coded stature distributions are broad and overlap substantially. Height is not a maturity meter.",move:"Protect privacy; compare references, never bodies.",ids:["G9-003","G9-004"]},
+    {icon:"≈",title:"Puberty varies",text:"Timing, tempo, sequence, visibility and meaning vary across a multi-year process.",move:"Never infer a private health stage from appearance.",ids:["G9-005"]},
+    {icon:"☾",title:"Sleep changes performance",text:"Planning, mood, attention and judgment can look different when sleep and schedules change.",move:"Separate a tired performance from global capacity.",ids:["G9-006","G9-012"]},
+    {icon:"◌",title:"Food is contextual",text:"Energy needs vary with body and activity. Population guidance is not a classroom calorie prescription.",move:"Support access; do not police food or weight.",ids:["G9-008"]}
+  ]},
+  advances:{kicker:"EMERGING CAPACITY",title:"What may be becoming more powerful",intro:"These capacities can appear unevenly across domains. Experience, instruction and accessible practice make them more dependable.",cards:[
+    {icon:"◇",title:"Abstract representation",text:"Work with variables, models, hypotheticals and ideas not directly present.",move:"Bridge concrete examples to formal representations.",ids:["G9-009","G9-010"]},
+    {icon:"↻",title:"Strategy adjustment",text:"Plan, monitor, use feedback, change approach and reflect on what worked.",move:"Model the invisible steps, then release control.",ids:["G9-011"]},
+    {icon:"{ }",title:"Computational design",text:"Decompose, design algorithms, troubleshoot systematically, build modularly, document and revise.",move:"Assess thinking—not typing speed or prior access.",ids:["G9-014","G9-015"]},
+    {icon:"✦",title:"Agency and identity",text:"Explore purpose, relationships, perspective and increasing autonomy with meaningful support.",move:"Pair real choice with clear, humane boundaries.",ids:["G9-016","G9-018"]}
+  ]},
+  cautions:{kicker:"CAPACITY ≠ CONSISTENCY",title:"What adults can easily misread",intro:"Variation is not evidence of laziness, immaturity or a broken developmental path.",cards:[
+    {icon:"≠",title:"Knowing is not always doing",text:"Planning, working memory, flexibility, inhibition and error monitoring do not strengthen in lockstep.",move:"Use checklists, intermediate deadlines and rehearsal.",ids:["G9-011","G9-012"]},
+    {icon:"⚑",title:"Pressure changes choices",text:"Immediate reward, emotion, peer attention and time pressure can change judgment in some settings.",move:"Offer private decision time before high-stakes choices.",ids:["G9-012","G9-013"]},
+    {icon:"⊘",title:"No “teen brain” verdict",text:"Developmental neuroscience is not a maturity test or prediction for an individual.",move:"Describe the situation and support—not the stereotype.",ids:["G9-012"]},
+    {icon:"△",title:"Needs overlap",text:"Maslow is a historical model, not a rule that lower needs must be completed before learning or creativity.",move:"Attend to safety, access, agency and connection together.",ids:["G9-019","G9-020"]}
+  ]},
+  possibilities:{kicker:"AGE- AND PLACE-DEPENDENT",title:"Surprising doors that may be opening",intro:"Permission is not readiness. Verify the learner’s exact age, jurisdiction, provider rules, safeguards and supports.",cards:[
+    {icon:"UT",title:"College coursework",text:"Utah public-school students in Grades 9–12 may access online concurrent enrollment, subject to course and provider rules.",move:"Possibility—not a universal milestone.",ids:["G9-022"]},
+    {icon:"15",title:"Learner permit",text:"In Utah, an application may begin at 15 with tests, supervision, education, practice and other conditions.",move:"A birthday never proves driving readiness.",ids:["G9-023"]},
+    {icon:"14+",title:"Limited employment",text:"Federal rules permit some 14- and 15-year-olds to do specified nonhazardous work outside school hours.",move:"Task, hours, state law and safety still control.",ids:["G9-024"]},
+    {icon:"IEP",title:"Individualized access",text:"Eligible learners ages 3–21 have individualized educational rights under IDEA, including access and appropriate support.",move:"A grade average never replaces the learner’s plan.",ids:["G9-021"]}
+  ]}
+};
 const domainMatchers=[
   /reading|writing|communication|literacy/i,
   /mathematics/i,
@@ -60,6 +92,8 @@ function render(){
   renderHeight('A');if(compare)renderHeight('B');
   const a=state.gradeA, b=state.gradeB;
   $("#snapshotTitle").textContent=compare&&a!==b?`${label(a)} (${ages[a]}) · ${label(b)} (${ages[b]})`:`${label(a)} · Typical age ${ages[a]}`;
+  $("#gradeNineGuide").hidden=a!=="9";
+  renderLensNote();
 }
 function renderHeight(w){
   const feet=+$(`#feet${w}`).value,inches=+$(`#inches${w}`).value,total=Math.min(72,feet*12+inches),person=$(`#person${w}`);
@@ -80,6 +114,26 @@ function openDomain(i){
   else{$("#dialogBody").innerHTML=`<p class="evidence-preface">${claims.length} sourced notes. These describe population evidence, expectations, or permissions—not an individual score.</p>${claims.map(o=>`<article class="evidence-card"><div class="evidence-meta"><span>${esc(o.classification)}</span><span class="strength ${esc(o.evidence_strength)}">${esc(o.evidence_strength)} evidence</span></div><h3>${esc(o.claim)}</h3><dl><dt>Range or scope</dt><dd>${esc(o.typical_range)}</dd><dt>Important variation</dt><dd>${esc(o.variability)}</dd><dt>Do not assume</dt><dd>${esc(o.what_educators_should_not_assume)}</dd></dl><a href="${esc(o.direct_url)}" target="_blank" rel="noopener">${esc(o.authority)} · ${esc(o.source_date)} ↗</a></article>`).join('')}`}
   $("#detailDialog").showModal();
 }
+function claimsByIds(ids){const profile=getProfile('9');return profile?profile.observations.filter(o=>ids.includes(o.observation_id)):[]}
+function openGuideEvidence(ids,title){
+  const claims=claimsByIds(ids);$("#dialogEyebrow").textContent="GRADE 9 · SOURCE NOTES";$("#dialogTitle").textContent=title;
+  $("#dialogBody").innerHTML=`<p class="evidence-preface">${claims.length} research note${claims.length===1?'':'s'}. Population evidence and standards provide context; they do not place an individual on a developmental scale.</p>${claims.map(o=>`<article class="evidence-card"><div class="evidence-meta"><span>${esc(o.classification)}</span><span class="strength ${esc(o.evidence_strength)}">${esc(o.evidence_strength)} evidence</span></div><h3>${esc(o.claim)}</h3><dl><dt>Scope</dt><dd>${esc(o.typical_range)}</dd><dt>Variation</dt><dd>${esc(o.variability)}</dd><dt>Do not assume</dt><dd>${esc(o.what_educators_should_not_assume)}</dd></dl><a href="${esc(o.direct_url)}" target="_blank" rel="noopener">${esc(o.authority)} · ${esc(o.source_date)} ↗</a></article>`).join('')}`;
+  $("#detailDialog").showModal();
+}
+function renderGuide(topic='baseline'){
+  const section=guideTopics[topic];
+  $("#guideContent").innerHTML=`<div class="guide-intro"><p class="overline">${section.kicker}</p><h3>${section.title}</h3><p>${section.intro}</p></div><div class="guide-card-grid">${section.cards.map((c,i)=>`<button class="guide-card" data-guide-card="${i}"><span class="guide-card-icon">${c.icon}</span><span><b>${c.title}</b><small>${c.text}</small><em>${c.move}</em></span><i aria-hidden="true">→</i></button>`).join('')}</div>`;
+  $$('[data-guide-card]').forEach(btn=>btn.addEventListener('click',()=>{const card=section.cards[+btn.dataset.guideCard];openGuideEvidence(card.ids,card.title)}));
+}
+function renderLensNote(){
+  const lenses=[state.mode==='compare'?$('#lensA').value:null,state.mode==='compare'?$('#lensB').value:$('#lensA').value].filter(Boolean);
+  const unique=[...new Set(lenses)];
+  const label=unique.length>1?'Mixed body references':unique[0]==='male'?'Male body reference':unique[0]==='female'?'Female body reference':'Shared human baseline';
+  $("#lensNoteTitle").textContent=state.mode==='compare'?`${label} · ${learnerName('A')}${state.mode==='compare'?` + ${learnerName('B')}`:''}`:label;
+  $("#lensNoteCopy").textContent=unique.includes('male')||unique.includes('female')?'The CDC growth display may use sex-coded population charts. Cognitive expectations remain shared: body-reference sex does not predict reasoning, interests, judgment, identity, or readiness.':'Cognitive expectations are not split into male and female minds. Choose a body reference only when a sex-coded growth comparison is useful.';
+  const bandText=unique.length>1?'Grade 9 CDC reference span · female + male charts':unique[0]==='male'?'Grade 9 CDC reference span · male chart':unique[0]==='female'?'Grade 9 CDC reference span · female chart':'Grade 9 CDC reference span · combined body reference';
+  $('#referenceHeightBand span').textContent=bandText;
+}
 function openSpectrum(grade){
   const profile=getProfile(grade);$("#spectrumTitle").textContent=label(grade);
   $("#spectrumIntro").textContent=profile?`${profile.conventional_ages} ${profile.overlapping_ages} Grade supplies context; it does not assign an individual developmental position.`:`Typical age ${ages[grade]}. Research is staged, but Grade 9 is the active interface reference.`;
@@ -90,11 +144,12 @@ function openSpectrum(grade){
 async function loadResearch(){try{const response=await fetch('gradelines-data.json');if(!response.ok)throw new Error('data unavailable');researchData=await response.json();$("#researchStatus").textContent='Grade 9 pilot · 24 sourced observations · checked September 7, 2026';renderDomains()}catch(error){$("#researchStatus").textContent='Research layer unavailable · interface remains usable'}}
 
 $$('.mode-button').forEach(btn=>btn.addEventListener('click',()=>{state.mode=btn.dataset.mode;$$('.mode-button').forEach(b=>{b.classList.toggle('active',b===btn);b.setAttribute('aria-pressed',b===btn)});if(state.mode==='compare')state.active='B';render()}));
-['A','B'].forEach(w=>{$(`#name${w}`).addEventListener('input',render);$(`#learner${w}Card`).addEventListener('click',()=>state.active=w)});
+['A','B'].forEach(w=>{$(`#name${w}`).addEventListener('input',render);$(`#lens${w}`).addEventListener('change',render);$(`#learner${w}Card`).addEventListener('click',()=>state.active=w)});
+$$('.guide-tab').forEach(btn=>btn.addEventListener('click',()=>{$$('.guide-tab').forEach(b=>{const active=b===btn;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active)});renderGuide(btn.dataset.guide)}));
 $$('.flyout-button').forEach(b=>b.addEventListener('click',()=>openDetail(b.dataset.detail)));
 $('#aboutButton').addEventListener('click',()=>openDetail('about'));
-$('#resetButton').addEventListener('click',()=>{state.gradeA='9';state.gradeB='9';state.active='A';['A','B'].forEach((w,i)=>{$(`#name${w}`).value='';$(`#age${w}`).value='typical';$(`#feet${w}`).value='5';$(`#inches${w}`).value=i?'3':'5'});render()});
+$('#resetButton').addEventListener('click',()=>{state.gradeA='9';state.gradeB='9';state.active='A';['A','B'].forEach((w,i)=>{$(`#name${w}`).value='';$(`#age${w}`).value='typical';$(`#lens${w}`).value='shared';$(`#feet${w}`).value='5';$(`#inches${w}`).value=i?'3':'5'});render()});
 $('#detailDialog .dialog-close').addEventListener('click',()=>$('#detailDialog').close());
 $('#detailDialog').addEventListener('click',e=>{if(e.target===$('#detailDialog'))$('#detailDialog').close()});
 $('#spectrumPanel .dialog-close').addEventListener('click',()=>$('#spectrumPanel').close());
-fillGrades();fillHeights();renderDomains();render();loadResearch();
+fillGrades();fillHeights();renderDomains();renderGuide();render();loadResearch();
