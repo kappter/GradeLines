@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="guide.css">
 </head>
 <body>
   <header class="topbar">
@@ -50,6 +51,7 @@
           <div class="fields">
             <label><span>Name or initials <small>optional</small></span><input id="nameA" type="text" maxlength="24" placeholder="Learner A" autocomplete="off"></label>
             <label><span>Relative age</span><select id="ageA"><option value="younger">Younger for grade</option><option value="typical" selected>Typical for grade</option><option value="older">Older for grade</option></select></label>
+            <label><span>Reference lens <small>not identity</small></span><select id="lensA"><option value="shared" selected>Shared human baseline</option><option value="male">Male body reference</option><option value="female">Female body reference</option></select></label>
             <label><span>Height <small>optional</small></span><span class="height-inputs"><select id="feetA" aria-label="Learner A height in feet"></select><select id="inchesA" aria-label="Learner A additional inches"></select></span></label>
           </div>
         </article>
@@ -62,6 +64,7 @@
           <div class="fields">
             <label><span>Name or initials <small>optional</small></span><input id="nameB" type="text" maxlength="24" placeholder="Learner B" autocomplete="off"></label>
             <label><span>Relative age</span><select id="ageB"><option value="younger">Younger for grade</option><option value="typical" selected>Typical for grade</option><option value="older">Older for grade</option></select></label>
+            <label><span>Reference lens <small>not identity</small></span><select id="lensB"><option value="shared" selected>Shared human baseline</option><option value="male">Male body reference</option><option value="female">Female body reference</option></select></label>
             <label><span>Height <small>optional</small></span><span class="height-inputs"><select id="feetB" aria-label="Learner B height in feet"></select><select id="inchesB" aria-label="Learner B additional inches"></select></span></label>
           </div>
         </article>
@@ -86,9 +89,36 @@
       </section>
     </section>
 
+    <section class="grade-nine-guide" id="gradeNineGuide" aria-labelledby="guideTitle">
+      <div class="guide-hero">
+        <div>
+          <p class="eyebrow">GRADE 9 FIELD GUIDE · RESEARCH PILOT</p>
+          <h2 id="guideTitle">A capable mind in a <em>variable</em> moment.</h2>
+          <p class="guide-deck">At roughly 14–15, many learners can work with abstraction, evidence, systems and increasingly complex choices. Reliability still changes with sleep, familiarity, emotion, time pressure, belonging and support.</p>
+        </div>
+        <div class="age-stamp"><span>TYPICAL</span><strong>14–15</strong><small>ordinary overlap 13–16+</small></div>
+      </div>
+
+      <div class="guide-rule"><strong>Start here:</strong> grade is placement—not a biological stage, maturity score, or prediction of one learner.</div>
+
+      <nav class="guide-tabs" aria-label="Grade 9 field guide topics">
+        <button class="guide-tab active" data-guide="baseline" aria-pressed="true">Broad reference</button>
+        <button class="guide-tab" data-guide="nature" aria-pressed="false">Nature & body</button>
+        <button class="guide-tab" data-guide="advances" aria-pressed="false">Cognitive advances</button>
+        <button class="guide-tab" data-guide="cautions" aria-pressed="false">Cognitive cautions</button>
+        <button class="guide-tab" data-guide="possibilities" aria-pressed="false">Possible now</button>
+      </nav>
+      <div class="guide-content" id="guideContent"></div>
+
+      <aside class="lens-note" id="lensNote">
+        <span class="lens-glyph">A/B</span>
+        <div><p class="overline">COMPARISON LENS</p><h3 id="lensNoteTitle">Shared human baseline</h3><p id="lensNoteCopy">Cognitive expectations are not split into male and female minds. Body reference charts can be shown separately when useful, while identity remains self-described and private.</p></div>
+      </aside>
+    </section>
+
     <section class="snapshot" aria-live="polite">
       <div class="snapshot-head">
-        <div><p class="eyebrow">DEVELOPMENTAL SNAPSHOT</p><h2 id="snapshotTitle">Grade 9 · Typical age 14–15</h2></div>
+        <div><p class="eyebrow">CONTEXT & IDENTITY</p><h2 id="snapshotTitle">Grade 9 · Typical age 14–15</h2></div>
         <div class="legend"><span><i class="dot a"></i><b id="legendA">Learner A</b></span><span id="legendBWrap" hidden><i class="dot b"></i><b id="legendB">Learner B</b></span></div>
       </div>
 
